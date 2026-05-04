@@ -49,10 +49,19 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.12;
+            opacity: 0.08;
             pointer-events: none;
             z-index: 100;
             mix-blend-mode: overlay;
+        }
+
+        #volume-control {
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+        #volume-control:hover {
+            opacity: 1 !important;
+            color: #C2A378;
         }
 
         .vignette-overlay {
@@ -67,14 +76,13 @@
             position: fixed;
             width: 6px;
             height: 6px;
-            background: #C2A378;
+            background: #ffffff;
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
-            filter: blur(2px);
-            box-shadow: 0 0 10px #C2A378;
+            box-shadow: 0 0 15px #C2A378, 0 0 5px #ffffff;
             mix-blend-mode: difference;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.08s ease-out;
         }
 
         .card-letter {
@@ -183,6 +191,55 @@
         .candle-glare {
             background: radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%);
         }
+
+        /* Marquee Animation */
+        .marquee-container {
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            gap: 2rem;
+            padding: 1.5rem 0;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll 120s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-33.333%); }
+        }
+
+        .wish-card {
+            width: 320px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: default;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+        }
+
+        .wish-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #C2A378;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+        }
     </style>
 </head>
 <body class="min-h-screen relative flex items-center justify-center p-6">
@@ -201,6 +258,9 @@
         <div class="flex flex-col">
             <span class="animate-pulse">Bernadya — Beranjak Dewasa</span>
             <span class="text-[6px] opacity-50 tracking-normal mt-0.5 font-light">Now Playing from Local Asset</span>
+        </div>
+        <div id="volume-control" class="ml-4 opacity-30">
+            <i data-lucide="volume-2" id="volume-icon" class="w-3 h-3"></i>
         </div>
     </div>
 
@@ -323,16 +383,6 @@
                         <p class="text-[10px] tracking-[0.8em] uppercase text-center opacity-30">You are infinite.</p>
                     </div>
 
-                    <div id="wishes-wall-container" class="w-full border-t border-white/5 pt-12 mt-12">
-                        <div class="flex items-center gap-4 mb-8 text-white/40 font-light tracking-widest text-[9px] uppercase">
-                            <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            <span>Titipan Doa</span>
-                        </div>
-                        <div id="wishes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[400px] overflow-y-auto pr-4 scrollbar-hide">
-                            <!-- Wishes populated by JS -->
-                        </div>
-                    </div>
-                    
                     <div class="flex flex-wrap justify-center gap-10 pt-10">
                         <button id="btn-restart" class="text-white/40 hover:text-paper transition-all flex items-center gap-2 text-[9px] uppercase tracking-widest font-light">
                             <i data-lucide="refresh-cw" class="w-3 h-3"></i> Dari awal lagi?
@@ -343,8 +393,27 @@
                     </div>
                 </div>
 
+                <!-- Global Scrolling Wishes -->
+                <div id="wishes-wall-container" class="hidden w-full border-t border-white/5 pt-12 mt-10 overflow-hidden pb-10">
+                    <div class="flex justify-between items-center mb-6 px-4">
+                        <div class="flex items-center gap-4 text-white/40 font-light tracking-widest text-[9px] uppercase">
+                            <i data-lucide="message-circle" class="w-4 h-4 text-[#C2A378]"></i>
+                            <span>Doa dari Teman-Teman</span>
+                        </div>
+                        <div id="wish-count" class="text-[8px] bg-[#C2A378]/10 text-[#C2A378] px-3 py-1 rounded-full tracking-[0.2em] font-bold">
+                            0 DOA TERKUMPUL
+                        </div>
+                    </div>
+                    
+                    <div class="marquee-container">
+                        <div id="wishes-track" class="marquee-track">
+                            <!-- Wishes populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Navigation -->
-                <div id="nav-next" class="mt-20 flex justify-end">
+                <div id="nav-next" class="mt-10 flex justify-end">
                     <button id="btn-next" class="group flex items-center gap-8">
                         <span class="text-white/40 group-hover:opacity-100 group-hover:text-[#C2A378] transition-all duration-1000 text-[9px] uppercase tracking-widest">Langkah Berikutnya</span>
                         <div class="h-px bg-white/10 w-24 group-hover:w-40 group-hover:bg-[#C2A378] transition-all duration-[2000ms]"></div>
@@ -441,16 +510,17 @@
             authDomain: "gen-lang-client-0611754805.firebaseapp.com",
             storageBucket: "gen-lang-client-0611754805.firebasestorage.app",
             messagingSenderId: "936149074231",
-            databaseId: "ai-studio-ea2ce6bc-b853-453f-b5a5-7fd51b1d4567"
+            firestoreDatabaseId: "ai-studio-ea2ce6bc-b853-453f-b5a5-7fd51b1d4567"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const db = firebase.app().firestore(firebaseConfig.firestoreDatabaseId);
 
         // STATE
         let currentPage = -1;
         let trollCount = 0;
         let isCandleLit = false;
         let typewriter = null;
+        let lastWishCount = -1;
 
         // ELEMENTS
         const startScreen = document.getElementById('page-start');
@@ -480,6 +550,19 @@
             starCursor.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 3}px)`;
         });
 
+        // VOLUME CONTROL
+        const volumeControl = document.getElementById('volume-control');
+        const volumeIcon = document.getElementById('volume-icon');
+        let isMuted = false;
+
+        volumeControl.addEventListener('click', () => {
+            isMuted = !isMuted;
+            bgMusic.muted = isMuted;
+            volumeIcon.setAttribute('data-lucide', isMuted ? 'volume-x' : 'volume-2');
+            volumeControl.style.opacity = isMuted ? '1' : '0.3';
+            lucide.createIcons();
+        });
+
         // INIT ICONS
         lucide.createIcons();
 
@@ -491,6 +574,7 @@
             
             startScreen.classList.add('hidden');
             storyScreen.classList.remove('hidden');
+            loadWishes(); // Load wishes early so user sees them immediately
             renderPage(0);
         });
 
@@ -507,6 +591,14 @@
             storyPhotoContainer.classList.add('hidden');
             storyTextContainer.className = "space-y-10 md:col-span-12";
             
+            // Show/Hide Marquee logic during story
+            const marquee = document.getElementById('wishes-wall-container');
+            if (page.type === "troll" || page.type === "candle") {
+                marquee.classList.add('hidden');
+            } else {
+                marquee.classList.remove('hidden');
+            }
+
             // Set Title
             if (page.title) {
                 storyTitleWrapper.classList.remove('hidden');
@@ -545,7 +637,6 @@
                 sectionCandle.classList.remove('hidden');
             } else if (page.type === "finale") {
                 sectionFinale.classList.remove('hidden');
-                loadWishes();
                 setTimeout(triggerConfetti, 1000);
             }
 
@@ -603,12 +694,15 @@
         // SUBMIT WISH
         const btnSubmitWish = document.getElementById('btn-submit-wish');
         btnSubmitWish.addEventListener('click', async () => {
-            const name = document.getElementById('input-name').value;
-            const content = document.getElementById('input-wish').value;
+            const nameEl = document.getElementById('input-name');
+            const contentEl = document.getElementById('input-wish');
+            const name = nameEl.value.trim();
+            const content = contentEl.value.trim();
             
             if (name && content) {
                 btnSubmitWish.disabled = true;
-                btnSubmitWish.innerText = "Mengirim...";
+                btnSubmitWish.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+                lucide.createIcons();
                 
                 try {
                     await db.collection('wishes').add({
@@ -616,45 +710,94 @@
                         content: content,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    
+                    // Show success state and move to finale
+                    showToast("Doa kamu telah terbit di langit-langit... ✨");
                     renderPage(currentPage + 1);
                 } catch (e) {
-                    console.error(e);
-                    alert("Gagal mengirim doa. Coba lagi.");
+                    console.error("Error saving wish:", e);
+                    alert("Gagal mengirim doa. Coba lagi ya.");
                     btnSubmitWish.disabled = false;
                     btnSubmitWish.innerText = "Titipkan Doa";
                 }
+            } else {
+                alert("Lengkapi nama dan doamu ya...");
             }
         });
 
         // LOAD WISHES
         function loadWishes() {
-            const wishesGrid = document.getElementById('wishes-grid');
-            wishesGrid.innerHTML = '<p class="col-span-full text-center text-white/30 italic py-10">Memuat doa...</p>';
+            const wishesTrack = document.getElementById('wishes-track');
+            const wishesWall = document.getElementById('wishes-wall-container');
+            const wishCount = document.getElementById('wish-count');
             
-            db.collection('wishes').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-                wishesGrid.innerHTML = '';
+            wishesWall.classList.remove('hidden');
+            
+            // Removing limit(20) to show more, or setting high limit like 100
+            db.collection('wishes').orderBy('createdAt', 'desc').limit(100).onSnapshot(snapshot => {
+                const isInitial = lastWishCount === -1;
+                const newWishIncoming = !isInitial && snapshot.size > lastWishCount;
+                lastWishCount = snapshot.size;
+
+                wishesTrack.innerHTML = '';
+                wishCount.innerText = `${snapshot.size} DOA TERKUMPUL`;
+                
                 if (snapshot.empty) {
-                    wishesGrid.innerHTML = '<p class="col-span-full text-center text-white/30 italic py-10 opacity-30">Belum ada doa yang ditulis... Jadilah yang pertama?</p>';
+                    wishesTrack.innerHTML = '<p class="text-white/20 italic text-[10px] tracking-widest uppercase py-10 opacity-30 px-10">Belum ada doa yang tertulis...</p>';
                     return;
                 }
                 
-                snapshot.forEach(doc => {
+                if (newWishIncoming && currentPage === 6) {
+                    showToast("Seseorang baru saja menitipkan doa... ✨");
+                }
+
+                const docs = snapshot.docs;
+                // Triple the segments to ensure enough width for infinite scroll
+                const loopDocs = [...docs, ...docs, ...docs];
+
+                loopDocs.forEach((doc, idx) => {
                     const data = doc.data();
-                    const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Baru saja';
-                    const wishCard = `
-                        <div class="p-6 bg-white/[0.02] border border-white/5 rounded-xl space-y-4 reveal-text-instant">
-                           <i data-lucide="quote" class="w-4 h-4 text-[#C2A378] opacity-30"></i>
-                           <p class="text-sm font-light leading-relaxed italic">"${data.content}"</p>
-                           <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                              <span class="text-[10px] font-bold text-[#C2A378] uppercase tracking-widest">${data.name}</span>
-                              <span class="text-[8px] opacity-20">${date}</span>
+                    const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) : 'Baru saja';
+                    
+                    const wishCard = document.createElement('div');
+                    wishCard.className = 'wish-card';
+                    
+                    const isNewest = (idx % docs.length === 0);
+
+                    wishCard.innerHTML = `
+                           <div class="space-y-4">
+                               <div class="flex justify-between items-start">
+                                  <i data-lucide="quote" class="w-4 h-4 text-[#C2A378] opacity-40"></i>
+                                  ${isNewest ? '<span class="text-[7px] bg-[#C2A378] text-black px-2 py-0.5 rounded-full font-black animate-pulse tracking-tighter">LATEST MESSAGE</span>' : `<span class="text-[6px] text-white/20 tracking-tighter uppercase font-mono">#${(docs.length - (idx % docs.length))}</span>`}
+                               </div>
+                               <p class="text-[12px] font-light leading-relaxed italic text-white/90 line-clamp-4">"${data.content}"</p>
                            </div>
-                        </div>
+                           <div class="pt-4 border-t border-white/5 mt-4">
+                              <div class="flex flex-col gap-0.5">
+                                 <span class="text-[10px] font-black text-[#C2A378] uppercase tracking-[0.2em]">${data.name}</span>
+                                 <span class="text-[7px] opacity-30 uppercase tracking-widest">${date}</span>
+                              </div>
+                           </div>
                     `;
-                    wishesGrid.innerHTML += wishCard;
+                    wishesTrack.appendChild(wishCard);
                 });
                 lucide.createIcons();
+            }, error => {
+                console.error("Firestore error:", error);
+                wishesTrack.innerHTML = `<p class="text-red-500/50 italic py-10 px-10 text-[10px]">Gagal memuat doa: ${error.message}</p>`;
             });
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-10 right-10 z-[200] bg-white text-black px-6 py-3 rounded-full text-[10px] uppercase font-black tracking-widest shadow-2xl page-fade-in flex items-center gap-3';
+            toast.innerHTML = `<i data-lucide="bell" class="w-3 h-3"></i> ${msg}`;
+            document.body.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 1000);
+            }, 5000);
         }
 
         // CONFETTI
