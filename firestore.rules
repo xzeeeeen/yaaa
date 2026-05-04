@@ -10,11 +10,8 @@ service cloud.firestore {
     function incoming() { return request.resource.data; }
     
     match /wishes/{wishId} {
-      allow read: if true; // Publicly readable
-      allow create: if isValidId(wishId) 
-        && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 50
-        && incoming().content is string && incoming().content.size() > 0 && incoming().content.size() <= 300
-        && incoming().createdAt == request.time;
+      allow read: if true;
+      allow create: if true; 
     }
   }
 }
