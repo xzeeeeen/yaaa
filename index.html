@@ -441,6 +441,7 @@
     
     <!-- Firebase Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
 
     <script>
@@ -701,27 +702,35 @@
             
             if (name && content) {
                 btnSubmitWish.disabled = true;
-                btnSubmitWish.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+                btnSubmitWish.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Mengirim Doa...</span>';
                 lucide.createIcons();
                 
                 try {
+                    // Using a timestamp that is guaranteed to work with server-side rules
+                    const now = firebase.firestore.FieldValue.serverTimestamp();
+                    
                     await db.collection('wishes').add({
                         name: name,
                         content: content,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        createdAt: now
                     });
                     
-                    // Show success state and move to finale
                     showToast("Doa kamu telah terbit di langit-langit... ✨");
+                    
+                    // Clear inputs
+                    nameEl.value = '';
+                    contentEl.value = '';
+                    
                     renderPage(currentPage + 1);
                 } catch (e) {
                     console.error("Error saving wish:", e);
-                    alert("Gagal mengirim doa. Coba lagi ya.");
+                    alert("Waduh, pengiriman gagal. Pastikan koneksimu lancar dan coba lagi ya.");
                     btnSubmitWish.disabled = false;
-                    btnSubmitWish.innerText = "Titipkan Doa";
+                    btnSubmitWish.innerHTML = 'Titipkan Doa <i data-lucide="send" class="w-3 h-3"></i>';
+                    lucide.createIcons();
                 }
             } else {
-                alert("Lengkapi nama dan doamu ya...");
+                alert("Lengkapi nama dan doamu dulu ya Lintang...");
             }
         });
 
