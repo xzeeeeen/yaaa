@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Lintang — Selamat Hari Jadi</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN (v3 for better compatibility) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        canvas: '#121212',
+                        paper: '#EBE8E4',
+                        gold: {
+                            dust: '#C2A378'
+                        },
+                        dusty: {
+                            rose: '#A37C74'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #EBE8E4;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            user-select: none;
+            cursor: none;
+        }
+
+        .film-grain {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 100;
+            mix-blend-mode: overlay;
+        }
+
+        .vignette-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+            z-index: 90;
+        }
+
+        .star-cursor {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #C2A378;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            filter: blur(2px);
+            box-shadow: 0 0 10px #C2A378;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease-out;
+        }
+
+        .card-letter {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-cinematic {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 9999px;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-size: 9px;
+            transition: all 1s ease;
+        }
+
+        .btn-cinematic:hover {
+            background: white;
+            color: black;
+        }
+
+        .btn-cinematic:active {
+            transform: scale(0.95);
+        }
+
+        .reveal-text {
+            background: linear-gradient(to right, #ffffff 50%, rgba(255,255,255,0.1) 50%);
+            background-size: 200% 100%;
+            background-position: 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: reveal 2.5s ease-out forwards;
+        }
+
+        @keyframes reveal {
+            from { background-position: 100%; }
+            to { background-position: 0%; }
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.2;
+            filter: blur(1px);
+            animation: particle-drift 15s linear infinite;
+        }
+
+        @keyframes particle-drift {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            20% { opacity: 0.4; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+        }
+
+        .flame-animation {
+            width: 2rem;
+            height: 3.5rem;
+            background: linear-gradient(to top, #ea580c, #facc15, #ffffff);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flame-flicker 0.6s infinite ease-in-out;
+            box-shadow: 0 0 40px rgba(249, 115, 22, 0.8);
+        }
+
+        @keyframes flame-flicker {
+            0%, 100% { transform: scale(1) rotate(-1deg); filter: blur(4px); }
+            50% { transform: scale(0.9) rotate(2deg); filter: blur(6px); }
+        }
+
+        .photo-glow {
+            box-shadow: 0 0 100px rgba(194, 163, 120, 0.15);
+            transition: box-shadow 2s ease;
+        }
+
+        .photo-glow:hover {
+            box-shadow: 0 0 150px rgba(194, 163, 120, 0.3);
+        }
+
+        #app-container {
+            transition: opacity 1.5s ease;
+        }
+
+        .page-fade-in {
+            animation: fadeIn 1.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .candle-glare {
+            background: radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex items-center justify-center p-6">
+    <div class="film-grain"></div>
+    <div class="vignette-overlay"></div>
+    <div id="star-cursor" class="star-cursor hidden md:block"></div>
+
+    <!-- Music Indicator -->
+    <div id="music-indicator" class="fixed top-12 left-1/2 -translate-x-1/2 z-[110] flex items-center gap-4 text-[9px] font-bold uppercase tracking-[0.5em] transition-all opacity-0">
+        <div class="flex gap-1 items-end h-3">
+            <div class="bar w-px bg-paper h-1 animate-[pulse_1s_infinite]"></div>
+            <div class="bar w-px bg-paper h-1 animate-[pulse_1s_infinite_0.2s]"></div>
+            <div class="bar w-px bg-paper h-1 animate-[pulse_1s_infinite_0.4s]"></div>
+            <div class="bar w-px bg-paper h-1 animate-[pulse_1s_infinite_0.6s]"></div>
+        </div>
+        <div class="flex flex-col">
+            <span class="animate-pulse">Bernadya — Beranjak Dewasa</span>
+            <span class="text-[6px] opacity-50 tracking-normal mt-0.5 font-light">Now Playing from Local Asset</span>
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <audio id="bg-music" loop>
+        <source src="public/lintang_song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- App Container -->
+    <main id="app-content" class="w-full max-w-4xl z-10">
+        <!-- Start Screen -->
+        <div id="page-start" class="text-center space-y-12">
+            <div class="space-y-6">
+                <div class="flex justify-center opacity-20 transition-all duration-[3000ms] scale-75 hover:scale-100">
+                    <i data-lucide="star" class="w-24 h-24 stroke-[0.5px]"></i>
+                </div>
+                <h1 class="font-serif italic text-6xl md:text-8xl tracking-tighter leading-tight">
+                    Sebuah Pesan <br/> Untuk <span class="text-gold-dust text-[#C2A378]">Lintang</span>
+                </h1>
+            </div>
+            
+            <button id="btn-start" class="btn-cinematic mx-auto mt-12 group">
+                Dengarkan <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Story Container (Initially Hidden) -->
+        <div id="page-story" class="hidden">
+            <div class="card-letter p-10 md:p-20 relative">
+                <i data-lucide="quote" class="absolute -top-6 -left-6 text-gold-dust text-[#C2A378] opacity-10 w-32 h-32"></i>
+                
+                <div id="story-grid" class="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
+                    <div id="story-text-container" class="space-y-10 md:col-span-12">
+                        <div id="story-title-wrapper" class="flex items-center gap-4 text-white/40 font-light tracking-widest text-[9px] uppercase">
+                            <div class="w-8 h-px bg-[#C2A378]"></div>
+                            <span id="story-title"></span>
+                        </div>
+
+                        <div id="story-content" class="font-serif italic text-3xl md:text-5xl text-paper leading-[1.4] tracking-tight min-h-[3em]">
+                        </div>
+
+                        <p id="story-subcontent" class="text-lg md:text-2xl font-light text-paper/40 leading-relaxed max-w-2xl border-l border-[#C2A378]/20 pl-10 reveal-text">
+                        </p>
+                    </div>
+
+                    <div id="story-photo-container" class="hidden md:col-span-5 flex justify-center">
+                        <div class="relative p-3 bg-white/5 border border-white/10 ring-1 ring-white/5 photo-glow animate-[float-slow_8s_infinite_ease-in-out]">
+                           <div class="overflow-hidden aspect-[3/4] w-full bg-[#121212]">
+                              <img src="public/lintang_star.png" 
+                                   onerror="this.src='https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?auto=format&fit=crop&q=80&w=1000'" 
+                                   class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-[4000ms] scale-110 hover:scale-100" 
+                                   alt="Lintang Star">
+                           </div>
+                           <div class="mt-6 space-y-1 px-2">
+                             <p class="font-serif text-[#C2A378] text-lg italic opacity-80">Snapshot No. 0412</p>
+                             <p class="text-[8px] tracking-widest uppercase opacity-30">Our bright moon in a quiet night</p>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special Sections -->
+                <div id="section-troll" class="hidden flex flex-col items-center py-20">
+                    <div id="troll-btn-wrapper">
+                        <button id="btn-troll" class="px-16 py-6 border border-[#C2A378]/50 text-[#C2A378] font-bold uppercase tracking-[0.4em] rounded-full shadow-2xl hover:bg-[#C2A378] hover:text-[#121212] transition-all duration-700 text-[10px] flex items-center gap-4">
+                            Kirim Doa <i data-lucide="mouse-pointer-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="section-challenge" class="hidden mt-16 p-12 bg-white/[0.02] border border-white/5 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-10 right-10 opacity-5 group-hover:rotate-12 transition-transform duration-1000">
+                        <i data-lucide="camera" class="w-32 h-32"></i>
+                    </div>
+                    <div class="flex items-center gap-4 mb-10">
+                       <i data-lucide="camera" class="w-4 h-4 text-[#C2A378]"></i>
+                       <span class="text-[9px] uppercase tracking-[0.4em] font-black opacity-30">Digital Time Capsule</span>
+                    </div>
+                    <div class="space-y-10 relative z-10">
+                       <p id="challenge-task" class="text-3xl md:text-5xl font-serif italic text-[#C2A378] leading-tight"></p>
+                       <div id="challenge-script" class="text-paper/40 text-lg md:text-xl font-light italic pl-8 border-l border-white/10 py-2"></div>
+                    </div>
+                </div>
+
+                <div id="section-candle" class="hidden flex flex-col items-center py-10 space-y-12">
+                    <div id="candle-trigger" class="relative group cursor-pointer">
+                        <div class="w-16 h-32 bg-paper/10 border border-white/10 rounded-t-lg relative overflow-hidden">
+                            <div id="candle-wax" class="absolute bottom-0 w-full bg-[#C2A378]/20 h-full transition-all duration-[10000ms]"></div>
+                        </div>
+                        <div id="flame" class="hidden absolute -top-24 left-1/2 -translate-x-1/2">
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 candle-glare blur-3xl opacity-50"></div>
+                            <div class="flame-animation w-8 h-14 bg-gradient-to-t from-orange-600 via-yellow-400 to-white rounded-full shadow-[0_0_40px_rgba(249,115,22,0.8)] relative z-10"></div>
+                        </div>
+                        <div id="candle-hint" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span class="text-[10px] uppercase tracking-[0.3em] font-black opacity-30 group-hover:opacity-100 transition-opacity">Klik untuk menyalakan</span>
+                        </div>
+                    </div>
+
+                    <div id="wish-form" class="hidden w-full max-w-md space-y-6">
+                        <div class="flex flex-col gap-4">
+                            <input id="input-name" type="text" placeholder="Siapa namamu?" class="bg-transparent border-b border-white/10 pb-2 focus:border-[#C2A378] outline-none transition-colors text-paper placeholder:text-paper/20">
+                            <textarea id="input-wish" placeholder="Tulis doamu di sini..." class="bg-transparent border-b border-white/10 pb-2 focus:border-[#C2A378] outline-none transition-colors text-paper placeholder:text-paper/20 h-24 resize-none"></textarea>
+                        </div>
+                        <button id="btn-submit-wish" class="w-full btn-cinematic justify-center group disabled:opacity-30">
+                            Titipkan Doa <i data-lucide="send" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="section-finale" class="hidden flex flex-col items-center gap-12 pt-12">
+                    <div class="flex gap-12 text-[#C2A378]">
+                        <i data-lucide="heart" class="w-8 h-8 animate-bounce"></i>
+                        <i data-lucide="party-popper" class="w-8 h-8 animate-bounce [animation-delay:0.2s]"></i>
+                        <i data-lucide="cake" class="w-8 h-8 animate-bounce [animation-delay:0.4s]"></i>
+                    </div>
+                    <div class="space-y-4">
+                        <h2 class="text-4xl md:text-7xl font-serif italic text-center max-w-2xl leading-tight">
+                            Tetaplah menjadi terangnya Lintang.
+                        </h2>
+                        <p class="text-[10px] tracking-[0.8em] uppercase text-center opacity-30">You are infinite.</p>
+                    </div>
+
+                    <div id="wishes-wall-container" class="w-full border-t border-white/5 pt-12 mt-12">
+                        <div class="flex items-center gap-4 mb-8 text-white/40 font-light tracking-widest text-[9px] uppercase">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            <span>Titipan Doa</span>
+                        </div>
+                        <div id="wishes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[400px] overflow-y-auto pr-4 scrollbar-hide">
+                            <!-- Wishes populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap justify-center gap-10 pt-10">
+                        <button id="btn-restart" class="text-white/40 hover:text-paper transition-all flex items-center gap-2 text-[9px] uppercase tracking-widest font-light">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Dari awal lagi?
+                        </button>
+                        <button id="btn-celebrate" class="text-[#C2A378] border-b border-[#C2A378]/20 pb-1 text-[10px] uppercase font-black tracking-[0.3em] flex items-center gap-3">
+                            Kirim Cinta <i data-lucide="hand-heart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div id="nav-next" class="mt-20 flex justify-end">
+                    <button id="btn-next" class="group flex items-center gap-8">
+                        <span class="text-white/40 group-hover:opacity-100 group-hover:text-[#C2A378] transition-all duration-1000 text-[9px] uppercase tracking-widest">Langkah Berikutnya</span>
+                        <div class="h-px bg-white/10 w-24 group-hover:w-40 group-hover:bg-[#C2A378] transition-all duration-[2000ms]"></div>
+                        <div class="p-4 rounded-full border border-white/5 bg-white/5 group-hover:bg-white group-hover:text-[#121212] transition-all">
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-10 w-full px-12 flex justify-between items-center z-50 pointer-events-none opacity-20">
+        <div class="text-[8px] font-black uppercase tracking-[1em]">LINTANG // 2026</div>
+        <div class="flex gap-6">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+    
+    <!-- Firebase Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // CONFIG
+        const STORY_PAGES = [
+            {
+                id: 0,
+                type: "text",
+                content: "katanya, waktu itu lari. tapi kadang kita yang terlalu sibuk jalan di tempat.",
+                subContent: "hari ini… langkahmu nambah satu tahun lagi, Lintang. 🌟",
+            },
+            {
+                id: 1,
+                type: "text",
+                title: "Di tengah ritme yang cepat...",
+                content: "dunia makin berisik, tanggung jawab makin berat, dan mimpi kadang kerasa makin jauh.",
+                subContent: "tapi di server kecil ini… kamu tetap punya tempat buat sekadar jadi diri sendiri. tanpa topeng, tanpa beban.",
+            },
+            {
+                id: 2,
+                type: "photo",
+                title: "Beranjak Dewasa",
+                content: "kamu mungkin merasa nggak banyak berubah...",
+                subContent: "tapi kehadiranmu di sini itu berarti. cara kamu tumbuh, cara kamu bertahan… itu inspirasi buat kita. makasih ya, Lintang, udah tetap bersinar meski langit lagi mendung. ✨",
+            },
+            {
+                id: 3,
+                type: "troll",
+                title: "Identity Check",
+                content: "katanya kalau makin dewasa, makin susah buat bahagia...",
+                subContent: "ayo kita lawan itu. buktikan kamu masih punya 'api' buat ngejar kebahagiaan kamu hari ini. (Tangkap tombolnya! 😈)"
+            },
+            {
+                id: 4,
+                type: "challenge",
+                title: "Momen Pendek",
+                content: "challenge buat Lintang yang makin dewasa.",
+                challenge: {
+                    task: "rekam video 10 detik.",
+                    note: "lihat kamera, dan senyum yang paling lebar.",
+                    script: "halo, ini Lintang. di umur yang baru ini… aku bakal lebih sayang sama diriku sendiri. 🌟"
+                },
+                footerNote: "Simpan ini. Nanti kalau duniamu lagi capek, tonton lagi buat ingat kalau kamu pernah sesenang ini."
+            },
+            {
+                id: 5,
+                type: "candle",
+                title: "The Ritual",
+                content: "sebelum kita tutup hari ini...",
+                subContent: "nyalakan lilin ini, tarik napas dalam-dalam, dan titipkan satu doa untuk satu tahun ke depan."
+            },
+            {
+                id: 6,
+                type: "finale",
+                title: "Selamat Ulang Tahun",
+                content: "selamat beranjak dewasa, Lintang. makasih sudah berani melangkah sejauh ini.",
+                subContent: "di antara jutaan bintang, buat kita… kamu tetap yang paling terang di server ini. 🎂🌟",
+                isFinal: true
+            }
+        ];
+
+        // FIREBASE SETUP
+        const firebaseConfig = {
+            projectId: "gen-lang-client-0611754805",
+            appId: "1:936149074231:web:8023d3f6a1081322f01ab2",
+            apiKey: "AIzaSyAWXWR3vhtxg-WandpKlLefv0Zxi3ZKYQ4",
+            authDomain: "gen-lang-client-0611754805.firebaseapp.com",
+            storageBucket: "gen-lang-client-0611754805.firebasestorage.app",
+            messagingSenderId: "936149074231",
+            databaseId: "ai-studio-ea2ce6bc-b853-453f-b5a5-7fd51b1d4567"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // STATE
+        let currentPage = -1;
+        let trollCount = 0;
+        let isCandleLit = false;
+        let typewriter = null;
+
+        // ELEMENTS
+        const startScreen = document.getElementById('page-start');
+        const storyScreen = document.getElementById('page-story');
+        const bgMusic = document.getElementById('bg-music');
+        const musicIndicator = document.getElementById('music-indicator');
+        const starCursor = document.getElementById('star-cursor');
+        
+        const storyTitleWrapper = document.getElementById('story-title-wrapper');
+        const storyTitle = document.getElementById('story-title');
+        const storyContent = document.getElementById('story-content');
+        const storySubcontent = document.getElementById('story-subcontent');
+        const storyPhotoContainer = document.getElementById('story-photo-container');
+        const storyTextContainer = document.getElementById('story-text-container');
+        
+        const sectionTroll = document.getElementById('section-troll');
+        const sectionChallenge = document.getElementById('section-challenge');
+        const sectionCandle = document.getElementById('section-candle');
+        const sectionFinale = document.getElementById('section-finale');
+        const navNext = document.getElementById('nav-next');
+        const btnNext = document.getElementById('btn-next');
+        const trollBtnWrapper = document.getElementById('troll-btn-wrapper');
+        const btnTroll = document.getElementById('btn-troll');
+
+        // CURSOR
+        document.addEventListener('mousemove', (e) => {
+            starCursor.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 3}px)`;
+        });
+
+        // INIT ICONS
+        lucide.createIcons();
+
+        // START APP
+        document.getElementById('btn-start').addEventListener('click', () => {
+            bgMusic.volume = 0.4;
+            bgMusic.play();
+            musicIndicator.style.opacity = '0.3';
+            
+            startScreen.classList.add('hidden');
+            storyScreen.classList.remove('hidden');
+            renderPage(0);
+        });
+
+        function renderPage(index) {
+            currentPage = index;
+            const page = STORY_PAGES[index];
+            
+            // Clean up
+            sectionTroll.classList.add('hidden');
+            sectionChallenge.classList.add('hidden');
+            sectionCandle.classList.add('hidden');
+            sectionFinale.classList.add('hidden');
+            navNext.classList.add('hidden');
+            storyPhotoContainer.classList.add('hidden');
+            storyTextContainer.className = "space-y-10 md:col-span-12";
+            
+            // Set Title
+            if (page.title) {
+                storyTitleWrapper.classList.remove('hidden');
+                storyTitle.innerText = page.title;
+            } else {
+                storyTitleWrapper.classList.add('hidden');
+            }
+
+            // Typewriter effect
+            storyContent.innerHTML = "";
+            typewriter = new Typewriter(storyContent, {
+                delay: 45,
+                cursor: ""
+            });
+            typewriter.typeString(page.content).start();
+
+            // Subcontent
+            storySubcontent.innerText = page.subContent;
+            storySubcontent.classList.remove('reveal-text');
+            void storySubcontent.offsetWidth; // Trigger reflow
+            storySubcontent.classList.add('reveal-text');
+
+            // Handle Types
+            if (page.type === "photo") {
+                storyPhotoContainer.classList.remove('hidden');
+                storyTextContainer.className = "space-y-10 md:col-span-7";
+            } else if (page.type === "troll") {
+                sectionTroll.classList.remove('hidden');
+                trollCount = 0;
+                btnTroll.style.transform = 'translate(0,0)';
+            } else if (page.type === "challenge") {
+                sectionChallenge.classList.remove('hidden');
+                document.getElementById('challenge-task').innerText = page.challenge.task;
+                document.getElementById('challenge-script').innerText = page.challenge.script;
+            } else if (page.type === "candle") {
+                sectionCandle.classList.remove('hidden');
+            } else if (page.type === "finale") {
+                sectionFinale.classList.remove('hidden');
+                loadWishes();
+                setTimeout(triggerConfetti, 1000);
+            }
+
+            // Show Nav
+            if (!page.isFinal && page.type !== "troll" && page.type !== "candle") {
+                setTimeout(() => {
+                    navNext.classList.remove('hidden');
+                    navNext.classList.add('page-fade-in');
+                }, 4000);
+            }
+        }
+
+        // NAVIGATION
+        btnNext.addEventListener('click', () => {
+            if (currentPage < STORY_PAGES.length - 1) {
+                renderPage(currentPage + 1);
+            }
+        });
+
+        // TROLL LOGIC
+        btnTroll.addEventListener('mouseenter', () => {
+            if (trollCount < 6) {
+                const x = (Math.random() - 0.5) * 500;
+                const y = (Math.random() - 0.5) * 400;
+                btnTroll.style.transform = `translate(${x}px, ${y}px)`;
+                trollCount++;
+            } else {
+                btnTroll.style.transform = `translate(0, 0)`;
+            }
+        });
+
+        btnTroll.addEventListener('click', () => {
+            if (trollCount >= 5) {
+                renderPage(currentPage + 1);
+            }
+        });
+
+        // CANDLE LOGIC
+        const candleTrigger = document.getElementById('candle-trigger');
+        const flame = document.getElementById('flame');
+        const wishForm = document.getElementById('wish-form');
+        const candleWax = document.getElementById('candle-wax');
+
+        candleTrigger.addEventListener('click', () => {
+            if (!isCandleLit) {
+                isCandleLit = true;
+                flame.classList.remove('hidden');
+                wishForm.classList.remove('hidden');
+                wishForm.classList.add('page-fade-in');
+                candleWax.style.height = '20%';
+                document.getElementById('candle-hint').classList.add('hidden');
+            }
+        });
+
+        // SUBMIT WISH
+        const btnSubmitWish = document.getElementById('btn-submit-wish');
+        btnSubmitWish.addEventListener('click', async () => {
+            const name = document.getElementById('input-name').value;
+            const content = document.getElementById('input-wish').value;
+            
+            if (name && content) {
+                btnSubmitWish.disabled = true;
+                btnSubmitWish.innerText = "Mengirim...";
+                
+                try {
+                    await db.collection('wishes').add({
+                        name: name,
+                        content: content,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    renderPage(currentPage + 1);
+                } catch (e) {
+                    console.error(e);
+                    alert("Gagal mengirim doa. Coba lagi.");
+                    btnSubmitWish.disabled = false;
+                    btnSubmitWish.innerText = "Titipkan Doa";
+                }
+            }
+        });
+
+        // LOAD WISHES
+        function loadWishes() {
+            const wishesGrid = document.getElementById('wishes-grid');
+            wishesGrid.innerHTML = '<p class="col-span-full text-center text-white/30 italic py-10">Memuat doa...</p>';
+            
+            db.collection('wishes').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                wishesGrid.innerHTML = '';
+                if (snapshot.empty) {
+                    wishesGrid.innerHTML = '<p class="col-span-full text-center text-white/30 italic py-10 opacity-30">Belum ada doa yang ditulis... Jadilah yang pertama?</p>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Baru saja';
+                    const wishCard = `
+                        <div class="p-6 bg-white/[0.02] border border-white/5 rounded-xl space-y-4 reveal-text-instant">
+                           <i data-lucide="quote" class="w-4 h-4 text-[#C2A378] opacity-30"></i>
+                           <p class="text-sm font-light leading-relaxed italic">"${data.content}"</p>
+                           <div class="flex justify-between items-center pt-4 border-t border-white/5">
+                              <span class="text-[10px] font-bold text-[#C2A378] uppercase tracking-widest">${data.name}</span>
+                              <span class="text-[8px] opacity-20">${date}</span>
+                           </div>
+                        </div>
+                    `;
+                    wishesGrid.innerHTML += wishCard;
+                });
+                lucide.createIcons();
+            });
+        }
+
+        // CONFETTI
+        function triggerConfetti() {
+            const end = Date.now() + 6 * 1000;
+            const colors = ['#C2A378', '#A37C74', '#ffffff', '#EBE8E4'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 45,
+                    origin: { x: 0, y: 0.8 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 45,
+                    origin: { x: 1, y: 0.8 },
+                    colors: colors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        document.getElementById('btn-celebrate').addEventListener('click', triggerConfetti);
+        document.getElementById('btn-restart').addEventListener('click', () => {
+             window.location.reload();
+        });
+
+        // PARTICLES
+        const body = document.body;
+        for(let i=0; i<15; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            const size = Math.random() * 3 + 1 + 'px';
+            p.style.width = size;
+            p.style.height = size;
+            p.style.animationDelay = Math.random() * 15 + 's';
+            p.style.animationDuration = 10 + Math.random() * 10 + 's';
+            body.appendChild(p);
+        }
+    </script>
+</body>
+</html>
