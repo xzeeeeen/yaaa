@@ -74,15 +74,18 @@
 
         .star-cursor {
             position: fixed;
-            width: 6px;
-            height: 6px;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
             background: #ffffff;
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
             box-shadow: 0 0 15px #C2A378, 0 0 5px #ffffff;
             mix-blend-mode: difference;
-            transition: transform 0.08s ease-out;
+            will-change: transform;
+            transform: translate(-50%, -50%);
         }
 
         .card-letter {
@@ -197,16 +200,16 @@
             overflow: hidden;
             user-select: none;
             display: flex;
-            gap: 2rem;
-            padding: 1.5rem 0;
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            gap: 2.5rem;
+            padding: 2.5rem 0;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
 
         .marquee-track {
             display: flex;
-            gap: 2rem;
-            animation: scroll 120s linear infinite;
+            gap: 2.5rem;
+            animation: scroll 70s linear infinite;
             width: max-content;
         }
 
@@ -439,10 +442,38 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
     
-    <!-- Firebase Compat -->
-    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase Modular -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            onSnapshot, 
+            query, 
+            orderBy, 
+            limit, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+        // FIREBASE SETUP
+        const firebaseConfig = {
+            projectId: "gen-lang-client-0611754805",
+            appId: "1:936149074231:web:8023d3f6a1081322f01ab2",
+            apiKey: "AIzaSyAWXWR3vhtxg-WandpKlLefv0Zxi3ZKYQ4",
+            authDomain: "gen-lang-client-0611754805.firebaseapp.com",
+            storageBucket: "gen-lang-client-0611754805.firebasestorage.app",
+            messagingSenderId: "936149074231",
+            firestoreDatabaseId: "ai-studio-ea2ce6bc-b853-453f-b5a5-7fd51b1d4567"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+
+        // Expose to window for the legacy script
+        window.firebase_db = { db, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp };
+        console.log("Firebase Modular Initialized for Database:", firebaseConfig.firestoreDatabaseId);
+    </script>
 
     <script>
         // CONFIG
@@ -503,18 +534,7 @@
             }
         ];
 
-        // FIREBASE SETUP
-        const firebaseConfig = {
-            projectId: "gen-lang-client-0611754805",
-            appId: "1:936149074231:web:8023d3f6a1081322f01ab2",
-            apiKey: "AIzaSyAWXWR3vhtxg-WandpKlLefv0Zxi3ZKYQ4",
-            authDomain: "gen-lang-client-0611754805.firebaseapp.com",
-            storageBucket: "gen-lang-client-0611754805.firebasestorage.app",
-            messagingSenderId: "936149074231",
-            firestoreDatabaseId: "ai-studio-ea2ce6bc-b853-453f-b5a5-7fd51b1d4567"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.app().firestore(firebaseConfig.firestoreDatabaseId);
+        // FIREBASE SETUP REMOVED - NOW IN MODULE SCRIPT ABOVE
 
         // STATE
         let currentPage = -1;
@@ -546,9 +566,15 @@
         const trollBtnWrapper = document.getElementById('troll-btn-wrapper');
         const btnTroll = document.getElementById('btn-troll');
 
-        // CURSOR
+        // CURSOR TRACKING
         document.addEventListener('mousemove', (e) => {
-            starCursor.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 3}px)`;
+            starCursor.style.left = `${e.clientX}px`;
+            starCursor.style.top = `${e.clientY}px`;
+        });
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            starCursor.style.left = `${touch.clientX}px`;
+            starCursor.style.top = `${touch.clientY}px`;
         });
 
         // VOLUME CONTROL
@@ -701,18 +727,22 @@
             const content = contentEl.value.trim();
             
             if (name && content) {
+                if (!window.firebase_db) {
+                    alert("Koneksi ke Dinding Doa sedang disiapkan, tunggu sebentar ya...");
+                    return;
+                }
+
                 btnSubmitWish.disabled = true;
                 btnSubmitWish.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Mengirim Doa...</span>';
                 lucide.createIcons();
                 
                 try {
-                    // Using a timestamp that is guaranteed to work with server-side rules
-                    const now = firebase.firestore.FieldValue.serverTimestamp();
+                    const { db, collection, addDoc, serverTimestamp } = window.firebase_db;
                     
-                    await db.collection('wishes').add({
+                    await addDoc(collection(db, 'wishes'), {
                         name: name,
                         content: content,
-                        createdAt: now
+                        createdAt: serverTimestamp()
                     });
                     
                     showToast("Doa kamu telah terbit di langit-langit... ✨");
@@ -736,14 +766,21 @@
 
         // LOAD WISHES
         function loadWishes() {
+            if (!window.firebase_db) {
+                setTimeout(loadWishes, 500);
+                return;
+            }
+            
+            const { db, collection, onSnapshot, query, orderBy, limit } = window.firebase_db;
             const wishesTrack = document.getElementById('wishes-track');
             const wishesWall = document.getElementById('wishes-wall-container');
             const wishCount = document.getElementById('wish-count');
             
             wishesWall.classList.remove('hidden');
             
-            // Removing limit(20) to show more, or setting high limit like 100
-            db.collection('wishes').orderBy('createdAt', 'desc').limit(100).onSnapshot(snapshot => {
+            const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'), limit(100));
+            
+            onSnapshot(q, snapshot => {
                 const isInitial = lastWishCount === -1;
                 const newWishIncoming = !isInitial && snapshot.size > lastWishCount;
                 lastWishCount = snapshot.size;
@@ -761,7 +798,6 @@
                 }
 
                 const docs = snapshot.docs;
-                // Triple the segments to ensure enough width for infinite scroll
                 const loopDocs = [...docs, ...docs, ...docs];
 
                 loopDocs.forEach((doc, idx) => {
