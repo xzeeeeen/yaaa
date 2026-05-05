@@ -82,9 +82,9 @@
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
-            box-shadow: 0 0 15px #C2A378, 0 0 5px #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
             mix-blend-mode: difference;
-            will-change: transform;
+            will-change: left, top;
             transform: translate(-50%, -50%);
         }
 
@@ -567,15 +567,23 @@
         const btnTroll = document.getElementById('btn-troll');
 
         // CURSOR TRACKING
+        let mouseX = -20, mouseY = -20;
         document.addEventListener('mousemove', (e) => {
-            starCursor.style.left = `${e.clientX}px`;
-            starCursor.style.top = `${e.clientY}px`;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
         });
         document.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
-            starCursor.style.left = `${touch.clientX}px`;
-            starCursor.style.top = `${touch.clientY}px`;
-        });
+            mouseX = touch.clientX;
+            mouseY = touch.clientY;
+        }, { passive: true });
+
+        function updateCursor() {
+            starCursor.style.left = `${mouseX}px`;
+            starCursor.style.top = `${mouseY}px`;
+            requestAnimationFrame(updateCursor);
+        }
+        updateCursor();
 
         // VOLUME CONTROL
         const volumeControl = document.getElementById('volume-control');
@@ -684,20 +692,35 @@
         });
 
         // TROLL LOGIC
-        btnTroll.addEventListener('mouseenter', () => {
+        function moveTrollButton() {
             if (trollCount < 6) {
-                const x = (Math.random() - 0.5) * 500;
-                const y = (Math.random() - 0.5) * 400;
+                // Limit the offset so it doesn't go too far off screen
+                const x = (Math.random() - 0.5) * 250;
+                const y = (Math.random() - 0.5) * 200;
                 btnTroll.style.transform = `translate(${x}px, ${y}px)`;
                 trollCount++;
-            } else {
-                btnTroll.style.transform = `translate(0, 0)`;
+                
+                if (trollCount === 6) {
+                    btnTroll.innerText = "Yaudah, Klik di sini!";
+                    btnTroll.style.transform = `translate(0, 0)`;
+                }
             }
-        });
+        }
+
+        btnTroll.addEventListener('mouseenter', moveTrollButton);
+        btnTroll.addEventListener('touchstart', (e) => {
+            if (trollCount < 6) {
+                e.preventDefault(); // Stop click from firing on move
+                moveTrollButton();
+            }
+        }, { passive: false });
 
         btnTroll.addEventListener('click', () => {
-            if (trollCount >= 5) {
+            if (trollCount >= 6) {
                 renderPage(currentPage + 1);
+            } else {
+                // If they somehow managed to click it before it moved
+                moveTrollButton();
             }
         });
 
